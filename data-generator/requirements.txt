@@ -1,0 +1,3 @@
+confluent_kafka==2.12.2
+fastapi==0.123.9
+uvicorn==0.38.0
