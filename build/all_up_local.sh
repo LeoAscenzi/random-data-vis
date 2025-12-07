@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
-docker compose -f "../deployments/docker-compose.local.yml" build datagenerator
-docker compose -f "../deployments/docker-compose.local.yml" build consumer
 docker compose -f "../deployments/docker-compose.local.yml" build broker
+docker compose -f "../deployments/docker-compose.local.yml" build generatedata
 echo "Starting Kafka broker container and then waiting 3 seconds"
 docker compose -f "../deployments/docker-compose.local.yml" up -d
-sleep 3
-echo "Kafka started, creating trade-data topic"
+sleep 2
+echo "Kafka started, creating trade topics"
 docker exec -it broker /opt/kafka/bin/kafka-topics.sh --create --topic trade-bids --bootstrap-server broker:29092
 docker exec -it broker /opt/kafka/bin/kafka-topics.sh --create --topic trade-asks --bootstrap-server broker:29092
-echo "Created trade-data topic, beginning producer loop in container"
+echo "Created trade topics, beginning producer loop in container"
+sleep 3
 
+docker build -t consumer:latest ../server/
+docker run -d --network backend -p 8081:8000 consumer

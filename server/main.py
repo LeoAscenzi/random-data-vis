@@ -8,29 +8,39 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
+kafka_url = os.getenv("KAFKA_URL")
+retry_interval = 5
+
+topics = ['trade-bids', 'trade-asks']
 
 queue = asyncio.Queue()
-async def consume():
-    consumer = AIOKafkaConsumer('trade-bids',
-                                bootstrap_servers=os.getenv("KAFKA_URL") + ":" + os.getenv("KAFKA_PORT"),
-                                group_id="my-group", 
-                                auto_offset_reset="latest")
-    try:
-        await consumer.start()
-    except Exception:
-        print("FAILURE CONNECTING TO KAFKA")
-    print("Started consumer?")
-    try:
-        async for msg in consumer:
-            data = msg.value.decode("UTF-8")
-            print(data)
-            await queue.put(data)
-    finally:
-        await consumer.stop()
-        print("Stopped consumer")
 
+async def consume():
+    while(1):
+        try:
+            print(f"Trying to connect to kafka at: {kafka_url}")
+            consumer = AIOKafkaConsumer(
+                                *topics,
+                                bootstrap_servers=kafka_url,
+                                auto_offset_reset="latest")
+            await consumer.start()
+            print(f"Consumer started on {kafka_url}")
+            async for msg in consumer:
+                data = msg.value.decode()
+                print(data)
+                await queue.put(data)
+        except Exception as e:
+            print(f"Disconnected from kafka with: {e}, retrying in {retry_interval} seconds")
+            await asyncio.sleep(retry_interval)
+        finally:
+            await consumer.stop()
+            print("Stopped consumer")
+
+        await asyncio.sleep(retry_interval)
+    
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    print("Starting up creating async task")
     kafka_task = asyncio.create_task(consume())
     yield
     kafka_task.cancel()
@@ -43,7 +53,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 origins = [
-    "http://localhost:5173",
+    "*",
 ]
 
 app.add_middleware(

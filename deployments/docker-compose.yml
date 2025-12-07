@@ -21,11 +21,11 @@ services:
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
       CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
-  datagenerator:
+  generatedata:
     build:
-      context: "../data-generator"
+      context: "../generatedata"
       dockerfile: Dockerfile
-    container_name: datagenerator
+    container_name: generatedata
     ports:
       - 8080:8000
   consumer:
@@ -38,4 +38,4 @@ services:
 
 networks:
   default:
-    name: producer_network
+    name: backend
