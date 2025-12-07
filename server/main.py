@@ -53,7 +53,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 origins = [
-    "*",
+    "http://localhost:5173",
 ]
 
 app.add_middleware(
@@ -64,6 +64,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+connections = set()
+
 @app.get("/")
 def healthcheck():
    return {"status": "App is up!"}
@@ -71,7 +73,12 @@ def healthcheck():
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
-    while True:
-        data = await queue.get()
-        await websocket.send_json(data)
+    connections.add(websocket)
+    try:
+        while True:
+            data = await queue.get()
+            for socket in connections:
+                await socket.send_json(data)
+    finally:
+        connections.remove(websocket)
 

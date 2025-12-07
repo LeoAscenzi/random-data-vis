@@ -11,4 +11,4 @@ echo "Created trade topics, beginning producer loop in container"
 sleep 3
 
 docker build -t consumer:latest ../server/
-docker run -d --network backend -p 8081:8000 consumer
+docker run -d --network backend -p 8081:8000 --name consumer consumer
