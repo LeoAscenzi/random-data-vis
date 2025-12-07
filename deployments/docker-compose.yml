@@ -19,7 +19,7 @@ services:
       KAFKA_LISTENERS: PLAINTEXT://broker:29092,CONTROLLER://broker:29093,PLAINTEXT_HOST://0.0.0.0:9092
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs-new
       CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
   generatedata:
     build:
@@ -28,14 +28,6 @@ services:
     container_name: generatedata
     ports:
       - 8080:8000
-  consumer:
-    build:
-      context: "../server"
-      dockerfile: Dockerfile
-    container_name: consumer
-    ports:
-      - 8081:8000
-
 networks:
   default:
     name: backend
