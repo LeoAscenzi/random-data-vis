@@ -16,7 +16,3 @@ jobs:
             cd /home/${{ secrets.EC2_USER }}/data-vis-backend/build &&
             chmod +x all_down.sh && ./all_down.sh
           '
-      - name: Test health
-        run: |
-          curl -f http://${{ secrets.EC2_HOST }}:8080/healthcheck
-          curl -f http://${{ secrets.EC2_HOST }}:8081/healthcheck

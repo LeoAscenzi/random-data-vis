@@ -32,6 +32,8 @@ services:
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs-new
       CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+    networks:
+      - backend
   generatedata:
     build:
       context: "../generatedata"
