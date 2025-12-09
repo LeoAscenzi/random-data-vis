@@ -1,6 +1,7 @@
 import random
 import time
 import uuid
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 from confluent_kafka import Producer
 
