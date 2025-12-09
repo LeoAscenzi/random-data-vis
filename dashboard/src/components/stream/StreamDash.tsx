@@ -2,6 +2,7 @@ import { useState, useEffect} from 'react'
 import './App.css'
 import StreamCell from './StreamCell';
 import StreamRow from './StreamRow';
+import SimulateBar from '../simulate/SimulateBar';
 
 
 function StreamDash() {
@@ -77,6 +78,9 @@ function StreamDash() {
     <div className="w-[100vw] grid grid-cols-16">
       <div className="absolute top-5 left-5 z-1">
         Status: {isConnected ? <span className="bg-green-500">Connected</span> : <span className="bg-red-500">Disconnected</span>}
+      </div>
+      <div className="absolute top-5 right-5 z-1">
+        <SimulateBar/>
       </div>
       <div className="grid grid-cols-8 col-start-2 col-span-14">
         <StreamRow key={"titleRow"}>

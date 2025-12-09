@@ -6,14 +6,17 @@ class BookEntry:
         self.bids: SortedDict = SortedDict()
         self.asks: SortedDict = SortedDict()
 
-    def add_order(self, req_type: str, price: float):
+    def add_order(self, req_type: str, price: float, id: str):
         if req_type == "Bid":
             price=-price
         order_type = self.bids if req_type == "Bid" else self.asks
-        order_type[price] = "ORDER_ID_HERE"
+        order_type[price] = id
 
-    def remove_order(self, req_type: str, price: float):
-        pass
+    def remove_order(self, req_type: str, price: float, id: str):
+        order_type = self.bids if req_type == "Bid" else self.asks
+        # order_type[price].remove(id)
+        # if not order_type[price]:
+        del order_type[price]
 
     def get_spread(self):
         if self.has_bids() and self.has_asks():
@@ -45,7 +48,7 @@ class BookEntry:
                     "spread": str(self.get_spread())}
     
     def to_json(self):
-        return {"bids": dict(self.bids), "asks": dict(self.bids)}
+        return {"bids": dict(self.bids), "asks": dict(self.asks)}
 
     def __str__(self):
         return f"[bids->{self.bids}, asks->{self.asks}]"

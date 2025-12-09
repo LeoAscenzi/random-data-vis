@@ -3,6 +3,7 @@ import asyncio
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from aiokafka import AIOKafkaConsumer
+import random
 
 from dotenv import load_dotenv
 import os
@@ -36,11 +37,12 @@ async def consume():
                 tp: str = req.type
                 sc: str = req.security
                 pr: float = float(req.price)
+                id: str = req.order_id
 
                 if not orderBook.contains_security(sc):
-                    orderBook.add_security(sc, tp, pr)
+                    orderBook.add_security(sc, tp, pr, id)
                 else:
-                    orderBook.add_order(sc, tp, pr)
+                    orderBook.add_order(sc, tp, pr, id)
 
                 # print(orderBook.to_json())
                 # print("\n")
@@ -58,15 +60,35 @@ async def consume():
             print("Stopped consumer")
 
         await asyncio.sleep(retry_interval)
-    
+
+async def cancel():
+    while True:
+        try:
+            active_order_count = orderBook.get_order_count()
+            # print(f"Active orders: {active_order_count}")
+            to_cancel = orderBook.get_random_order_id()
+            # print(f"Want to cancel {to_cancel}")
+            if active_order_count > 4 and to_cancel is not None:
+                sc = orderBook.get_order_by_id(to_cancel)["sc"]
+                orderBook.cancel_order_by_id(to_cancel)
+                await queue.put({"security": sc,
+                                 "topBid": orderBook.get_top(sc, "Bid"), 
+                                 "topAsk": orderBook.get_top(sc, "Ask"), 
+                                 "spread": orderBook.get_spread(sc)})
+        except Exception as e:
+            print(f"Error in cancel task: {e}")
+        await asyncio.sleep(0.001)
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Starting up creating async task")
-    kafka_task: asyncio.Task = asyncio.create_task(consume())
+    consumer_task: asyncio.Task = asyncio.create_task(consume())
+    cancel_random: asyncio.Task = asyncio.create_task(cancel())
     yield
-    kafka_task.cancel()
+    consumer_task.cancel()
+    cancel_random.cancel()
     try:
-        await kafka_task
+        await consumer_task
     except asyncio.CancelledError:
         pass
     print("Done")
