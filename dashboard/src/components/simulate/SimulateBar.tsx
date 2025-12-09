@@ -21,18 +21,20 @@ const SimulateBar = () => {
         }
     }
     return(
-        <div className="grid grid-cols-3 max-w-[40vw] md:max-w-[30vw] lg:max-w-[20vw]">
+        <div className="grid grid-cols-4 max-w-[40vw] md:max-w-[30vw] lg:max-w-[20vw]">
+            {!isLoading ? <div onClick={handleRunSimulation} className="cursor-pointer">Simulate</div> : <div className="bg-green-600">Running...</div>}
             <input
+                className="max-w-16 text-center"
                 type="text"
                 value={count}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => setCount(event.target.value)} 
             />
             <input
+                className="max-w-16 text-center"
                 type="text"
                 value={delay}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => setDelay(event.target.value)} 
             />
-            {!isLoading ? <div onClick={handleRunSimulation} className="cursor-point">Simulate</div> : <div className="bg-green-600">Running...</div>}
         </div>
     )
 }

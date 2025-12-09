@@ -1,5 +1,7 @@
 #root {
   text-align: center;
+  position: absolute;
+  top: 0;
 }
 
 .logo {

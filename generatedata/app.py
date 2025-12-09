@@ -6,19 +6,21 @@ from fastapi import FastAPI
 from confluent_kafka import Producer
 
 
-trade_type: list = ['Bid', 'Ask']
-sec_labels: list = ["RTX", "MLP", "NVDA", "TSLA", "PLTR"]
+trade_type: list[str] = ['Bid', 'Ask']
 sec_config = {"RTX":{"mp":171, "sp":10},
               "MLP":{"mp":50, "sp":15},
               "NVDA":{"mp":185, "sp":2},
               "TSLA":{"mp":439, "sp":8},
               "PLTR":{"mp":181, "sp":5}}
+
 def connect_and_send(data_count: int, delay: float):
     p = Producer({'bootstrap.servers': 'broker:29092'})
     i = 0
+    startTime: float = time.time()
+    sec_keys: list[str] = list(sec_config.keys())
     while(i < data_count):
         type = random.choice(trade_type)
-        sec = random.choice(sec_labels)
+        sec = random.choice(sec_keys)
         price_mid = sec_config[sec]["mp"]
         price_spread = sec_config[sec]["sp"]
 
@@ -37,8 +39,12 @@ def connect_and_send(data_count: int, delay: float):
         
         time.sleep(delay)
         i+=1
+    endTime: float = time.time()
 
+    duration_ms: float = endTime - startTime
     p.flush()
+    return (duration_ms, i)
+
 
 app = FastAPI()
 
@@ -62,4 +68,5 @@ def healthcheck():
 
 @app.post("/createdata")
 def start_data(data_count: int, delay: float):
-    connect_and_send(data_count, delay)
+    duration_ms, i = connect_and_send(data_count, delay)
+    return {"duration": duration_ms, "count": i}
