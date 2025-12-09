@@ -1,15 +1,16 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 type StreamCellProps = {
     data: string;
     isTitle?: boolean;
 
 }
+const flashDuration = 100; // ms
 const StreamCell = React.memo(({data, isTitle} : StreamCellProps) => 
 {
-
     const [isBlinking, setIsBlinking] = useState<boolean>(false);
-
+    const [oldValue, setOldValue] = useState<string>(data);
+    const [increased, setIncreased] = useState<boolean>(false);
 
     useEffect(() => {
         if (!isTitle) { 
@@ -19,11 +20,25 @@ const StreamCell = React.memo(({data, isTitle} : StreamCellProps) =>
         }
     }, [data, isTitle]);
 
+    useEffect(() => {
+        if(oldValue != data)
+        {
+            try {
+                setIncreased(parseFloat(oldValue) < parseFloat(data));
+            }
+            catch(e)
+            {
+                console.error(e)
+            }
+        }
+        setOldValue(data);
+    },[data]) 
+
     return <div className=
                 {
                     `min-h-16 text-center content-center border-1 bg-gray-600 
                     ${isTitle && "border-none bg-gray-900"}
-                    ${isBlinking && "bg-green-500 transition-colors duration-300 ease-out"}
+                    ${isBlinking && `bg-${increased ? "green" : "red"}-500 transition-colors duration-${flashDuration} ease-out`}
                     `
                 }
         >{data}</div>

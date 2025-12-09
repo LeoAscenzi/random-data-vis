@@ -34,6 +34,9 @@ class OrderBook:
     
     def get_top(self, sec: str, req_type: str):
         return self.orders[sec].get_top(req_type)
+    
+    def get_count(self, sec: str, req_type: str):
+        return self.orders[sec].get_count(req_type)
 
     def remove_security(self, sec: str):
         self.orders[sec].cleanup()
@@ -67,6 +70,10 @@ class OrderBook:
         if not self.orders_by_id:
             return None
         return random.choice(list(self.orders_by_id.keys()))
+    
+    def cleanup(self):
+        self.orders.clear()
+        self.orders_by_id.clear()
 
     def to_json(self):
         return {sec: self.orders[sec].to_json() for sec in self.orders}

@@ -64,17 +64,15 @@ async def consume():
 async def cancel():
     while True:
         try:
-            active_order_count = orderBook.get_order_count()
-            # print(f"Active orders: {active_order_count}")
             to_cancel = orderBook.get_random_order_id()
-            # print(f"Want to cancel {to_cancel}")
-            if active_order_count > 4 and to_cancel is not None:
+            if to_cancel is not None:
                 sc = orderBook.get_order_by_id(to_cancel)["sc"]
-                orderBook.cancel_order_by_id(to_cancel)
-                await queue.put({"security": sc,
-                                 "topBid": orderBook.get_top(sc, "Bid"), 
-                                 "topAsk": orderBook.get_top(sc, "Ask"), 
-                                 "spread": orderBook.get_spread(sc)})
+                if(orderBook.get_count(sc, "Bid") > 4 and orderBook.get_count(sc, "Ask") > 4):
+                    orderBook.cancel_order_by_id(to_cancel)
+                    await queue.put({"security": sc,
+                                    "topBid": orderBook.get_top(sc, "Bid"), 
+                                    "topAsk": orderBook.get_top(sc, "Ask"), 
+                                    "spread": orderBook.get_spread(sc)})
         except Exception as e:
             print(f"Error in cancel task: {e}")
         await asyncio.sleep(0.001)
@@ -120,6 +118,15 @@ def get_all_data():
 @app.get("/get-all-spread")
 def get_all_spread():
     return orderBook.to_spread_json()
+
+@app.get("/reset-all-data")
+def reset_all_data():
+    orderBook.cleanup()
+    return {"status" : "Cleaned up!"}
+
+@app.get("get-average-rate")
+def get_average_rate():
+    return {"rate": "1"}
 
 connections: set = set()
 dead_sockets: set = set()

@@ -29,16 +29,16 @@ class BookEntry:
             return (-float(order_type.peekitem(0)[0])) if req_type == "Bid" else float(order_type.peekitem(0)[0])
         else:
             return None
+        
+    def get_count(self, req_type: str) -> int:
+        order_type = self.bids if req_type == "Bid" else self.asks
+        return len(order_type)
     
     def has_bids(self):
         return len(self.bids) > 0
 
     def has_asks(self):
         return len(self.asks) > 0
-
-    def cleanup(self):
-        del self.bids
-        del self.asks
 
     def to_spread_json(self):
         if self.has_asks() and self.has_bids():

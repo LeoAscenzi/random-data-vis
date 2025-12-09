@@ -32,7 +32,7 @@ const SimulateBar = () => {
                 value={delay}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => setDelay(event.target.value)} 
             />
-            {!isLoading ? <div onClick={handleRunSimulation}>Simulate</div> : <div className="bg-green-600">Running...</div>}
+            {!isLoading ? <div onClick={handleRunSimulation} className="cursor-point">Simulate</div> : <div className="bg-green-600">Running...</div>}
         </div>
     )
 }
