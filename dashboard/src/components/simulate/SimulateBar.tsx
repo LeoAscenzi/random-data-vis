@@ -21,7 +21,7 @@ const SimulateBar = () => {
         }
     }
     return(
-        <div className="grid grid-cols-3 md:max-w-[30vw] sm:max-w-[40vw] max-w-[20vw]">
+        <div className="grid grid-cols-3 max-w-[40vw] md:max-w-[30vw] lg:max-w-[20vw]">
             <input
                 type="text"
                 value={count}
