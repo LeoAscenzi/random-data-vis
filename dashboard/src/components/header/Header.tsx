@@ -13,6 +13,7 @@ const Header = ({isConnected, websocketUrl} : HeaderProps) => {
     const [producerRate, setProducerRate] = useState<number>(0);
     const [consummerRate, setConsumerRate] = useState<number>(0);
 
+    const [testStatus, setTestStatus] = useState<string>("not_started");
 
     return (
     <div className="grid grid-cols-8 col-span-16 z-1 text-left border-b-1 mb-12">
@@ -29,11 +30,13 @@ const Header = ({isConnected, websocketUrl} : HeaderProps) => {
             setIsLoading={setIsLoading}
             setProducerRate={setProducerRate}
             setConsumerRate={setConsumerRate}
+            setTestStatus={setTestStatus}
         />
         <StatsBar
             theoreticalRate= {count && delay && parseFloat(delay) > 0 ? 1/parseFloat(delay) : 0}
             producerRate = {producerRate}
             consumerRate = {consummerRate}
+            testStatus={testStatus}
         />
     </div>
     )

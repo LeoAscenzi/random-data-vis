@@ -96,6 +96,11 @@ async def lifespan(app: FastAPI):
     yield
     consumer_task.cancel()
     cancel_random.cancel()
+    del app.state.count_total
+    del app.state.count_tostart_timetal
+    del app.state.end_time
+    del app.state.target_count
+
     try:
         await consumer_task
     except asyncio.CancelledError:
@@ -154,6 +159,8 @@ def poll_stats():
 
 @app.post("/prepare-stats")
 def prepare_stats(data_count: int):
+    if(app.state.end_time is not None):
+        return {"status" : "not_ready"}
     app.state.count_total = 0
     app.state.end_time = None
     app.state.target_count = data_count

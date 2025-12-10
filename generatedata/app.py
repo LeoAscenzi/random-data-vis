@@ -37,7 +37,8 @@ def connect_and_send(data_count: int, delay: float):
         if(d['type'] =="Ask"):
             p.produce('trade-asks', str(d).encode('utf-8'))
         
-        time.sleep(delay)
+        if(delay != -1):
+            time.sleep(delay)
         i+=1
     endTime: float = time.time()
 

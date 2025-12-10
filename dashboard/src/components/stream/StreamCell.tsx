@@ -5,7 +5,6 @@ type StreamCellProps = {
     isTitle?: boolean;
 
 }
-const flashDuration = 100; // ms
 const StreamCell = React.memo(({data, isTitle} : StreamCellProps) => 
 {
     const [isBlinking, setIsBlinking] = useState<boolean>(false);
@@ -15,7 +14,7 @@ const StreamCell = React.memo(({data, isTitle} : StreamCellProps) =>
     useEffect(() => {
         if (!isTitle) { 
             setIsBlinking(true);
-            const timeout = setTimeout(() => setIsBlinking(false), 300);
+            const timeout = setTimeout(() => setIsBlinking(false), 200);
             return () => clearTimeout(timeout);
         }
     }, [data, isTitle]);
@@ -33,15 +32,16 @@ const StreamCell = React.memo(({data, isTitle} : StreamCellProps) =>
         }
         setOldValue(data);
     },[data]) 
-
-    return <div className=
-                {
-                    `min-h-16 text-center content-center border-1 bg-gray-600 
-                    ${isTitle && "border-none bg-gray-900"}
-                    ${isBlinking && `bg-${increased ? "green" : "red"}-500 transition-colors duration-${flashDuration} ease-out`}
-                    `
-                }
-        >{data}</div>
+    return (
+        <div className={`
+            min-h-16 text-center content-center border-1 bg-gray-600 
+            ${isTitle && "border-none bg-gray-900"}
+            ${isBlinking && increased && "bg-green-500 transition-colors duration-200 ease-out"}
+            ${isBlinking && !increased && "bg-red-500 transition-colors duration-200 ease-out"}
+        `}>
+            {data}
+        </div>
+    )
 });
 
 export default StreamCell;
